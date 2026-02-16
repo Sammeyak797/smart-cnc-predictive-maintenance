@@ -6,3 +6,4 @@ load_dotenv()
 class Config:
     MONGO_URI = os.getenv("MONGO_URI")
     JWT_SECRET = os.getenv("JWT_SECRET")
+    JWT_EXPIRATION = 24  # hours
