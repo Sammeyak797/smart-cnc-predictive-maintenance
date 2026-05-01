@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  background-color: #0f172a; /* matches your dark theme */
+}
+
+#root {
+  min-height: 100vh;
+}
