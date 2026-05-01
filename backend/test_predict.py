@@ -1,5 +1,3 @@
-from model.predict import predict_failure
-import sys
 import os
 import pytest
 
@@ -7,8 +5,11 @@ if os.getenv("CI") == "true":
     pytest.skip("Skipping ML model test in CI", allow_module_level=True)
 
 
+import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+
+from model.predict import predict_failure
 sample_data = {
     "type": "L",
     "air_temp": 300,
