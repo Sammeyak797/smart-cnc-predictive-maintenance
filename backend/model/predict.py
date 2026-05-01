@@ -12,18 +12,20 @@ model_path           = os.path.join(BASE_DIR, "model", "model.pkl")
 type_encoder_path    = os.path.join(BASE_DIR, "model", "le_type.pkl")
 failure_encoder_path = os.path.join(BASE_DIR, "model", "le_failure.pkl")
 
-try:
-    model      = joblib.load(model_path)
-    le_type    = joblib.load(type_encoder_path)
-    le_failure = joblib.load(failure_encoder_path)
-    logger.info("ML models loaded successfully.")
-except FileNotFoundError as e:
-    raise RuntimeError(
-        f"Model file not found: {e.filename}. "
-        "Run train.py to generate model files first."
-    ) from e
-except Exception as e:
-    raise RuntimeError(f"Failed to load ML models: {e}") from e
+model = None
+le_type = None
+le_failure = None
+
+if os.path.exists(model_path):
+    try:
+        model      = joblib.load(model_path)
+        le_type    = joblib.load(type_encoder_path)
+        le_failure = joblib.load(failure_encoder_path)
+        logger.info("ML models loaded successfully.")
+    except Exception as e:
+        logger.warning(f"Model load failed: {e}")
+else:
+    logger.warning("Model files not found → running without ML model")
 
 # Must match train.py FEATURE_COLUMNS exactly — including engineered features
 FEATURE_COLUMNS = [
@@ -42,6 +44,11 @@ VALID_TYPES = {"L", "M", "H"}
 
 
 def predict_failure(data: dict) -> dict:
+    if model is None or le_type is None or le_failure is None:
+        return {
+            "failure_type": "Unknown",
+            "confidence": 0.0
+        }
     """
     Predict machine failure type and confidence from sensor readings.
 
