@@ -42,7 +42,7 @@ jobs:
           FLASK_DEBUG: "false"
           FRONTEND_ORIGIN: http://localhost:5173
           JWT_SECRET_KEY: test-secret-key-for-ci
-        run: pytest --tb=short --color=yes
+        run: pytest tests/ -v
 
   # ── Job 2: Frontend Tests ────────────────────────────────────────────────
   frontend-tests:
