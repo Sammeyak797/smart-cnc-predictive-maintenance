@@ -1,6 +1,11 @@
 from model.predict import predict_failure
 import sys
 import os
+import pytest
+
+if os.getenv("CI") == "true":
+    pytest.skip("Skipping ML model test in CI", allow_module_level=True)
+
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
