@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Flask, jsonify
 from flask_cors import CORS
 from config import Config
@@ -18,22 +19,48 @@ def create_app() -> Flask:
     app.config.setdefault("TESTING", False)
 
     # ── CORS ──────────────────────────────────────────────────────────────
-    # In testing: allow all origins so test client works without CORS errors.
-    # In production: restrict to the exact Vercel frontend URL set in the
-    # FRONTEND_ORIGIN environment variable on Render.
     if app.config.get("TESTING"):
+        # Tests: allow everything — no real browser making requests
         CORS(app)
     else:
-        allowed_origin = os.environ.get(
+        # Production: allow localhost + any URL that belongs to your
+        # Vercel project (covers production URL, branch previews, and
+        # PR preview deployments which all have different subdomains).
+        #
+        # FRONTEND_ORIGIN on Render should be set to your PRIMARY
+        # production Vercel URL, e.g.:
+        #   https://smart-cnc-predictive-maintenance.vercel.app
+        #
+        # The regex below additionally allows ANY subdomain of vercel.app
+        # that contains your project name so branch previews also work.
+        primary_origin = os.environ.get(
             "FRONTEND_ORIGIN",
             "http://localhost:5173"
         )
+
+        # Extract the vercel project slug from the primary origin
+        # e.g. "smart-cnc-predictive-maintenance" from the full URL
+        vercel_pattern = re.compile(
+            r"https://smart-cnc-predictive-maintenance[a-zA-Z0-9\-]*\.vercel\.app"
+        )
+
+        def is_allowed_origin(origin):
+            if not origin:
+                return False
+            # Always allow localhost for local development
+            if origin.startswith("http://localhost"):
+                return True
+            # Allow the exact primary production URL
+            if origin == primary_origin:
+                return True
+            # Allow all Vercel preview/branch deployment URLs
+            if vercel_pattern.match(origin):
+                return True
+            return False
+
         CORS(
             app,
-            resources={r"/api/*": {"origins": [
-                allowed_origin,
-                "http://localhost:5173",   # always allow local dev
-            ]}},
+            resources={r"/api/*": {"origins": is_allowed_origin}},
             supports_credentials=True,
         )
 
