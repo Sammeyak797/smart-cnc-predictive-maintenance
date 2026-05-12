@@ -77,5 +77,4 @@ def acknowledge_alert():
         }), 200
 
     except Exception as e:
-        # BUG FIX #1: clean JSON 500 instead of HTML traceback
         return jsonify({"error": "Failed to acknowledge alert", "detail": str(e)}), 500
