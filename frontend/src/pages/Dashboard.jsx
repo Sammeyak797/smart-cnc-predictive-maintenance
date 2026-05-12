@@ -71,7 +71,7 @@ function KpiCard({ icon, label, value, accent = "blue" }) {
             <div className={`absolute -top-4 -right-4 w-20 h-20 rounded-full bg-gradient-to-br ${g.grad} opacity-10 group-hover:opacity-20 transition-opacity`} />
             <div className={`inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl ${g.bg} ${g.text} mb-2 sm:mb-3`}>{icon}</div>
             <p className="text-[10px] sm:text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">{label}</p>
-            <p className="text-lg sm:text-2xl font-black text-gray-900 dark:text-white truncate leading-none">{value}</p>
+            <p className="text-lg sm:text-2xl font-black text-gray-900 dark:text-white leading-none break-words">{value}</p>
         </div>
     );
 }
